@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  bio       String?
+  avatarUrl String?
+  posts     Post[]
+  comments  Comment[]
+  tips      Tip[]
+  userPlants UserPlant[]
+  followers Follow[] @relation("followers")
+  following Follow[] @relation("following")
+  tipComments CommentOnTip[]
+  notifications Notification[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now())
+}
+
+model Plant {
+  id               String   @id @default(uuid())
+  commonName       String
+  scientificName   String
+  description      String
+  careInstructions String
+  imageUrl         String
+  tips             Tip[]
+  userPlants       UserPlant[]
+}
+
+model Tip {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  plant     Plant?   @relation(fields: [plantId], references: [id])
+  plantId   String?
+  content   String
+  upvotes   Int      @default(0)
+  comments  CommentOnTip[]
+  createdAt DateTime @default(now())
+}
+
+model UserPlant {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  plantId   String
+  nickname  String?
+  milestones Json    // e.g. {"watered": [...], "fertilized": [...], ...}
+  badges    UserBadge[]
+  createdAt DateTime @default(now())
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  iconUrl     String
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id         String   @id @default(uuid())
+  userPlant  UserPlant @relation(fields: [userPlantId], references: [id])
+  userPlantId String
+  badge      Badge    @relation(fields: [badgeId], references: [id])
+  badgeId    String
+  awardedAt  DateTime @default(now())
+}
+
+model Follow {
+  id         String  @id @default(uuid())
+  follower   User    @relation("following", fields: [followerId], references: [id])
+  followerId String
+  following  User    @relation("followers", fields: [followingId], references: [id])
+  followingId String
+  createdAt  DateTime @default(now())
+}
+
+model CommentOnTip {
+  id        String   @id @default(uuid())
+  tip       Tip      @relation(fields: [tipId], references: [id])
+  tipId     String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  content   String
+  parent    CommentOnTip? @relation("ParentComment", fields: [parentId], references: [id])
+  parentId  String?
+  replies   CommentOnTip[] @relation("ParentComment")
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
