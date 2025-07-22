@@ -13,7 +13,7 @@ export default function Register() {
     setLoading(true);
     setMessage("");
     try {
-      await axios.post("http://localhost:3000/api/auth/register", form);
+      await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/register`, form);
       setMessage("Registration successful! You can now log in.");
       setForm({ name: "", email: "", password: "" });
     } catch (err) {

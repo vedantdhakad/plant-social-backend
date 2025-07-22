@@ -8,7 +8,7 @@ export default function Posts() {
   const [loading, setLoading] = useState(false);
 
   const fetchPosts = async () => {
-    const res = await axios.get("http://localhost:3000/api/posts");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/posts`);
     setPosts(res.data);
   };
 
@@ -22,7 +22,7 @@ export default function Posts() {
     setMessage("");
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3000/api/posts", form, {
+      await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/posts`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage("Post created!");

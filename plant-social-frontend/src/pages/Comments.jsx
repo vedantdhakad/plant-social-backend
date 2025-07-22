@@ -8,7 +8,7 @@ export default function Comments() {
   const [loading, setLoading] = useState(false);
 
   const fetchComments = async () => {
-    const res = await axios.get("http://localhost:3000/api/comments");
+    const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/comments`);
     setComments(res.data);
   };
 
@@ -22,7 +22,7 @@ export default function Comments() {
     setMessage("");
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3000/api/comments", form, {
+      await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/comments`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage("Comment created!");
