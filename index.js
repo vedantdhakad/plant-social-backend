@@ -4,7 +4,15 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+const allowedOrigins = [
+  'https://plant-social-backend-exmhnalp5-vedant-dhakads-projects.vercel.app', // Vercel frontend URL
+  'http://localhost:5173' // local dev
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // Route imports
